@@ -15,8 +15,8 @@ const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 const generate = async (keyword) => {
     try{
         const result = await model.generateContent(`generate 15+ word related to keyword or industry ${keyword} `);
-        console.log(result.response.text());
-         return result.response.text()
+        console.log(result.response.text().split(" "));
+         return result.response.text().split(" ")
 
     }catch(err){
         console.log("error"+ err);

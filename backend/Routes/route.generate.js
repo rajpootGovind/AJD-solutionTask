@@ -42,5 +42,5 @@
 const generateController = require("../Controller/generate.controller")
 
 module.exports = (app) =>{
-    app.post("/api/generate", generateController.generateKeyword)
+    app.post("/api/generateNames", generateController.generateKeyword)
 }

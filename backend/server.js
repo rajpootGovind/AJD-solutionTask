@@ -13,7 +13,8 @@ app.use(express.json())
 
 const PORT = process.env.PORT;
 
-
+// routes 
+ require("./Routes/route.generate")(app)
 
 
 // Start the server

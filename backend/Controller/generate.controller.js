@@ -35,10 +35,11 @@ const generate = async (keyword) => {
     res.send({
         result : result
     })
+    
 
-    const businessNames = result.data.candidates.map((candidate) => candidate.text.trim());
+    // const businessNames = result.data.candidates.map((candidate) => candidate.text.trim());
 
-    res.status(200).json({ businessNames }); // Send the names back to the frontend
+    // res.status(200).json({ businessNames }); // Send the names back to the frontend
     
     }catch (error) {
         console.error("Error generating names:", error.message); // Log any error

@@ -1,9 +1,13 @@
 const express = require('express');
 const axios = require('axios');
 const router = express.Router();
+require("dotenv").config()
 
 router.post('/', async (req, res) => {
     const { keyword } = req.body;
+    if (!keyword) {
+        return res.status(400).json({ success: false, error: 'Keyword is required' });
+      }
 
     try {
         console.log("Before Axios");

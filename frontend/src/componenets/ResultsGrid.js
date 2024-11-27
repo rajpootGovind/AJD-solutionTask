@@ -1,7 +1,8 @@
 import React from 'react';
 
-const ResultsGrid = ({ results }) => {
-    if (!results.length) return null;
+const ResultsGrid = ({ results }) => 
+    {
+    if (!results.length) return null
 
     return (
         <table className="min-w-full bg-white border border-gray-300">
@@ -12,15 +13,15 @@ const ResultsGrid = ({ results }) => {
                 </tr>
             </thead>
             <tbody>
-                {results.map((result, idx) => (
-                    <tr key={idx} className="text-center">
+                {results.map((result, index) => (
+                    <tr key={index} className="text-center">
                         <td className="p-2 border">{result.name}</td>
                         <td className="p-2 border">{result.available ? 'Yes' : 'No'}</td>
                     </tr>
                 ))}
             </tbody>
         </table>
-    );
-};
+    )
+}
 
-export default ResultsGrid;
+export default ResultsGrid

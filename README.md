@@ -28,7 +28,7 @@ Limitation- Manytimes i get errors during checking the api in postman. Cause of 
  EndPoints- 
  for businessNames- http://localhost:7888/api/generate-names
  for domainAvailability- http://localhost:7888/api/check-domains'
- Note- These API not working properly due to lack of time and experience, i am not able to resolve it.
+ Note- These API not working properly due to lack of time and experience, i tried so many approach to resolve but i am not able to resolve it.
  Thank YOU
 
 

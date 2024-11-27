@@ -1,75 +1,68 @@
-const { GoogleGenerativeAI } = require("@google/generative-ai");
-const express = require("express");
-const bodyParser = require("body-parser");
-const axios = require("axios"); // Import axios for making domain check API calls
+// const axios = require('axios');
 
-require("dotenv").config();
-const app = express();
+// // Function to call the Google Gemini API to generate business names
+// const generateBusinessNames = async (keyword) => {
+//   try {
+//     const response = await axios.post('https://api.google.com/gemini/generate-names', {
+//       keyword: keyword,
+//       count: 15
+//     }, {
+//       headers: { Authorization: `Bearer ${process.env.GEMINI_API_KEY}` }
+//     });
+   
+    
+//     return response.data.names;  // Assuming Gemini returns names in `names` field
+//   } catch (error) {
+//     console.error('Error generating names:', error);
+//     // throw new Error('Could not generate names');
+//   }
+// };
 
-app.use(express.json());
-app.use(bodyParser.json());
+// // Function to check domain availability using WhoisXML API
+// const checkDomainAvailability = async (name) => {
+//   try {
+//     const response = await axios.get(`https://www.whoisxmlapi.com/whoisserver/WhoisService`, {
+//       params: {
+//         apiKey: process.env.WHOISXML_API_KEY,
+//         domainName: `${name}.com`,
+//         outputFormat: 'JSON'
+//       }
+//     });
 
-const genAI = new GoogleGenerativeAI(process.env.API_KEY);
-const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+//     // The WhoisXML API returns the status in the "WhoisRecord" field. If the domain is available, the status will be "AVAILABLE"
+//     const domainStatus = response.data.WhoisRecord.domainName;
+//     return !domainStatus;  // If no Whois record is found, the domain is available
+//   } catch (error) {
+//     console.error('Error checking domain availability:', error);
+//     //throw new Error('Could not check domain availability');
+//   }
+// };
 
-// Function to generate business names based on the industry/keyword
-const generate = async (keyword) => {
-    try {
-        const result = await model.generateContent(`generate 15+ words related to keyword or industry ${keyword}`);
-        return result.response.text().split("\n"); // Assuming names are separated by newlines
-    } catch (err) {
-        console.log("Error generating names: " + err);
-    }
-};
+// // Controller function to handle the /generate-names route
+// const generateNames = async (req, res) => {
+//   const { keyword } = req.body;
 
-// Function to check domain availability using Domainr API
-const checkDomainAvailability = async (name) => {
-    const domain = `${name}.com`; // Assuming .com is the domain extension to check
-    const apiKey = process.env.DOMAIN_API_KEY; // Store your Domainr API key in environment variables
+//   if (!keyword) {
+//     return res.status(400).json({ error: 'Keyword is required' });
+//   }
 
-    try {
-        const response = await axios.get(`https://www.whoisxmlapi.com/whoisserver/WhoisService`);
-        const status = response.data.status[0]; // Domain status response
-        const isAvailable = status.code === "AVAILABLE"; // Check if domain is available
-        return isAvailable;
-    } catch (error) {
-        console.error("Error checking domain availability:", error);
-        return false; // Return false in case of any error
-    }
-};
+//   try {
+//     // Generate business names using Google Gemini
+//     const names = await generateBusinessNames(keyword);
 
-// Endpoint to generate business names and check domain availability
-exports.generateKeyword = async (req, res) => {
-    try {
-        const keyword = req.body.keyword;
-        if (!keyword) {
-            return res.status(400).json({ message: "Keyword is required" });
-        }
+//     const namesWithAvailability = [];
 
-        // Generate business names based on the keyword
-        const generatedNames = await generate(keyword);
+//     // Check the availability of the .com domain for each name
+//     for (const name of names) {
+//       const isAvailable = await checkDomainAvailability(name);
+//       namesWithAvailability.push({ name, isAvailable });
+//     }
 
-        // Check domain availability for each generated name
-        const namesWithAvailability = [];
-        for (const name of generatedNames) {
-            const isAvailable = await checkDomainAvailability(name.trim()); // Check availability for each name
-            namesWithAvailability.push({
-                businessName: name.trim(),
-                isAvailable: isAvailable ? "Available" : "Not Available",
-            });
-        }
+//     // Return the names and domain availability status
+//     return res.json({ names: namesWithAvailability });
+//   } catch (error) {
+//     return res.status(500).json({ error: 'Failed to generate names or check domain availability' });
+//   }
+// };
 
-        // Send the results back to the frontend
-        res.status(200).json({ result: namesWithAvailability });
-    } catch (error) {
-        console.error("Error generating names or checking domains:", error.message);
-        res.status(500).json({ message: "Failed to generate business names or check domain availability" });
-    }
-};
-
-// Example Express route to trigger keyword generation and domain check
-// app.post("/api/generate-names", exports.generateKeyword);
-
-// app.listen(5000, () => {
-//     console.log("Server is running on http://localhost:5000");
-// });
+// module.exports = { generateNames };

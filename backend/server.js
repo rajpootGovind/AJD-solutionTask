@@ -1,26 +1,19 @@
+const express = require('express');
+const cors = require('cors');
+require('dotenv').config();
 
-const express = require("express");
+const generateNamesRoute = require('./Routes/routes.generateNames');
+const checkDomainsRoute = require('./Routes/route.checkDomains');
 
-const dotenv = require("dotenv");
-
-
-
-
-dotenv.config();
 const app = express();
+app.use(cors());
+app.use(express.json());
 
-app.use(express.json())
+app.use('/api/generate-names', generateNamesRoute);
+app.use('/api/check-domains', checkDomainsRoute);
 
-const PORT = process.env.PORT;
+const PORT = process.env.PORT 
 
-// routes 
- require("./Routes/route.generate")(app)
-
-
-// Start the server
 app.listen(PORT, () => {
-    // console.log(`get error ${err}`);
-    
-  console.log(`Server running successfully on port ${PORT}`);
-  
+    console.log(`Server running on http://localhost:${PORT}`);
 });

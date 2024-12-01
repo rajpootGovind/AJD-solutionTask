@@ -1,59 +1,46 @@
 const express = require('express');
-
-//axios for making http req
 const axios = require('axios');
+const retry = require('retry');
 
-//for creating router
 const router = express.Router();
 
-//load env variables
-require("dotenv").config()
+require('dotenv').config()
 
-
-
-//post route to generate business names
 router.post('/', async (req, res) => {
-    //get keyword from req body
-    const { keyword } = req.body;
-    if (!keyword) {
-        return res.status(400).json({ success: false, error: 'Keyword is required' });
-      }
+  const { keyword } = req.body;
 
+  if (!keyword) {
+    return res.status(400).json({ success: false, error: 'Keyword is required' });
+  }
+
+  const operation = retry.operation({
+    retries: 5,
+    factor: 2,
+    minTimeout: 1000,
+    maxTimeout: 60000,
+  });
+
+  operation.attempt(async () => {
     try {
-        console.log("Before Axios");
+      const response = await axios.post(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
+        {
+          prompt: `Generate 15+ business names for "${keyword}"`,
+          // ... other request options
+        }
+      );
 
-        // sending a post to gemini api for getting names
-        const response = await axios.post(
-            'https://generativeai.googleapis.com/v1beta3/models/text:generate',
-            {
-                //promt to generate business names
-                prompt: `Generate 15+ business names for "${keyword}"`,
-               
-            },
-            {
-                headers: {
-                    //specify key and type of content
-                    Authorization: `Bearer ${process.env.GEMINI_API_KEY}`,
-                    'Content-Type': 'application/json'
-                }
-            }
-        );
-
-        console.log("After Axios");
-
-        //Get names from api res
-        const names = response.data.candidates.map(candidate => candidate.output);
-        //send res as a json formt
-        res.json({ success: true, names });
-
-    } 
-    //for error handling
-    catch (error) {
-        // will retun internal server error
-        console.error(`error during generating names ${error}`);
+      const names = response.data.candidates.map(candidate => candidate.output);
+      res.json({ success: true, names });
+    } catch (error) {
+      if (operation.retry(error)) {
+        console.error('Retrying request due to:', error);
+      } else {
+        console.error('Failed to fetch data:', error);
         res.status(500).json({ success: false, error: 'Failed to generate names' });
+      }
     }
+  });
 });
 
-// export the router for use in other place like main application
 module.exports = router;
